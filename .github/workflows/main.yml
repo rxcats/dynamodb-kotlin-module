@@ -2,9 +2,9 @@ name: Test all supported JDKs on all systems
 
 on:
     push:
-        branches: [ master ]
+        branches: [ main ]
     pull_request:
-        branches: [ master ]
+        branches: [ main ]
 
 jobs:
     coverage:
