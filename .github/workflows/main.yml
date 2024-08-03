@@ -1,0 +1,69 @@
+name: Test all supported JDKs on all systems
+
+on:
+    push:
+        branches: [ master ]
+    pull_request:
+        branches: [ master ]
+
+jobs:
+    coverage:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout latest code
+              uses: actions/checkout@v4
+
+            - name: Set up JDK
+              uses: actions/setup-java@v4
+              with:
+                  java-version: 17
+                  distribution: temurin
+
+            - name: Build Coverage
+              run: sh ./gradlew check jacocoTestReport
+
+            - name: Upload Coverage
+              uses: codecov/codecov-action@v4
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+    test:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                java_version: [17, 21]
+                os: [windows-latest, macOS-latest, ubuntu-latest]
+                distribution: [ temurin ]
+        steps:
+            - name: Checkout latest code
+              uses: actions/checkout@v4
+
+            - name: Set up ${{ matrix.distribution }} JDK ${{ matrix.java_version }} on ${{ matrix.os }}
+              uses: actions/setup-java@v4
+              with:
+                  java-version: ${{ matrix.java_version }}
+                  distribution: ${{ matrix.distribution }}
+
+            - name: Test
+              run: sh ./gradlew check
+    publish:
+        needs: [ test, coverage ]
+        runs-on: ubuntu-latest
+        if: "!contains(github.event.commits[0].message, '[skip ci]')"
+        steps:
+            - name: Checkout latest code
+              uses: actions/checkout@v4
+
+            - name: Set up JDK
+              uses: actions/setup-java@v4
+              with:
+                  java-version: 17
+                  distribution: temurin
+
+            - name: Publish
+              env:
+                  ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.central_username }}
+                  ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.central_password }}
+                  ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.signing_key }}
+                  ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.signing_key_password }}
+              run: sh ./gradlew publish --no-configuration-cache

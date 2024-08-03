@@ -1,0 +1,11 @@
+services:
+  dynamodb:
+    container_name: dynamodb
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: amazon/dynamodb-local:latest
+    restart: always
+    ports:
+      - 8000:8000
+    environment:
+      REGION: "ap-northeast-2"
+    working_dir: /home/dynamodblocal

@@ -1,0 +1,45 @@
+[versions]
+# https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter
+kotlin = "1.9.24"
+spring-boot = "3.3.2"
+spring-dependency-management = "1.1.6"
+
+# https://mvnrepository.com/artifact/software.amazon.awssdk/bom
+aws-java-sdk-v2 = "2.26.25"
+dynamodb-local = "2.5.0"
+
+maven-publish = "0.29.0"
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+
+[libraries]
+# boms
+aws-bom = { module = "software.amazon.awssdk:bom", version.ref = "aws-java-sdk-v2" }
+
+# spring boot
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
+
+# kotlin
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
+
+# junit
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+# jackson
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
+jackson-datatype-jdk8 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jdk8" }
+
+# awssdk
+awssdk-dynamodb-enhanced = { module = "software.amazon.awssdk:dynamodb-enhanced" }
+dynamodb-local = { module = "com.amazonaws:DynamoDBLocal", version.ref = "dynamodb-local" }
+
+[bundles]
+jackson = ["jackson-module-kotlin", "jackson-datatype-jsr310", "jackson-datatype-jdk8"]
