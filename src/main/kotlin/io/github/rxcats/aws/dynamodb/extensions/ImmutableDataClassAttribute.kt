@@ -8,8 +8,6 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.ImmutableAttribute
 import software.amazon.awssdk.enhanced.dynamodb.mapper.StaticAttributeTag
 import software.amazon.awssdk.enhanced.dynamodb.mapper.StaticAttributeTags
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.BeanTableSchemaAttributeTag
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbConvertedBy
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondarySortKey
@@ -96,7 +94,7 @@ internal fun <Table : Any, Attr : Any?> KProperty1<Table, Attr>.toImmutableDataC
     dataClass: KClass<Table>,
     schemaCache: MetaTableSchemaCache
 ): ImmutableAttribute<Table, ImmutableDataClassBuilder, Attr> {
-    val converter = findAnnotation<DynamoDbConvertedBy>()
+    val converter = findAnnotation<DynamoDbKtConvertedBy>()
         ?.value
         ?.let { it as KClass<AttributeConverter<Attr>> }
         ?.let { initConverter(it) }
@@ -108,7 +106,7 @@ internal fun <Table : Any, Attr : Any?> KProperty1<Table, Attr>.toImmutableDataC
             EnhancedType.of(ImmutableDataClassBuilder::class.java),
             converter.type()
         )
-        .name(findAnnotation<DynamoDbAttribute>()?.value ?: name)
+        .name(findAnnotation<DynamoDbKtAttribute>()?.name ?: name)
         .getter(::get)
         .setter { builder, value -> builder[name] = value }
         .attributeConverter(converter)

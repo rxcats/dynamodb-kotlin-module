@@ -49,7 +49,7 @@ mavenPublishing {
     configure(KotlinJvm(sourcesJar = true))
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
     signAllPublications()
-    coordinates("io.github.rxcats", "dynamodb-kotlin-module", "0.0.1")
+    coordinates("io.github.rxcats", "dynamodb-kotlin-module", "0.0.2")
 
     pom {
         name.set("DynamoDb Kotlin Module")

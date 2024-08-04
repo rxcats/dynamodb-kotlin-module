@@ -49,10 +49,7 @@ class UserRepositoryTest {
         fun beforeAll(@Autowired repo: UserRepository) {
             repo.createTable()
 
-            val user = User(
-                pk = "tester#1001",
-                name = "tester",
-            )
+            val user = User(pk = "tester#1001", name = "tester")
 
             repo.save(user)
         }
@@ -66,6 +63,14 @@ class UserRepositoryTest {
 
     @Test
     fun getItemTest() {
+        val user = repository.getItem(User(pk = "tester#1001"))
+        assertThat(user).isNotNull()
+        assertThat(user?.createdAt).isAfter(Instant.EPOCH)
+        assertThat(user?.updatedAt).isAfter(Instant.EPOCH)
+    }
+
+    @Test
+    fun getItemByKeyTest() {
         val user = repository.getItem(Key.builder().partitionValue("tester#1001").build())
         assertThat(user).isNotNull()
         assertThat(user?.createdAt).isAfter(Instant.EPOCH)
@@ -74,6 +79,14 @@ class UserRepositoryTest {
 
     @Test
     fun transactionGetItemTest() {
+        val user = repository.transactionGetItem(User(pk = "tester#1001"))
+        assertThat(user).isNotNull()
+        assertThat(user?.createdAt).isAfter(Instant.EPOCH)
+        assertThat(user?.updatedAt).isAfter(Instant.EPOCH)
+    }
+
+    @Test
+    fun transactionGetItemByKeyTest() {
         val user = repository.transactionGetItem(Key.builder().partitionValue("tester#1001").build())
         assertThat(user).isNotNull()
         assertThat(user?.createdAt).isAfter(Instant.EPOCH)
@@ -81,7 +94,25 @@ class UserRepositoryTest {
     }
 
     @Test
-    fun transactionTest() {
+    fun itemSaveDeleteTest() {
+        val user = User(pk = "tester#7001")
+        repository.save(user)
+        repository.delete(user)
+        val after = repository.getItem(user)
+        assertThat(after).isNull()
+    }
+
+    @Test
+    fun transactionSaveDeleteItemTest() {
+        val user = User(pk = "tester#6001")
+        repository.transactionSave(user)
+        repository.transactionDelete(user)
+        val after = repository.transactionGetItem(user)
+        assertThat(after).isNull()
+    }
+
+    @Test
+    fun transactionByKeysTest() {
         val samples = listOf(
             User(pk = "tester#2001", name = "2001"),
             User(pk = "tester#2002", name = "2002"),
@@ -102,7 +133,28 @@ class UserRepositoryTest {
     }
 
     @Test
-    fun batchTest() {
+    fun transactionByItemsTest() {
+        val samples = listOf(
+            User(pk = "tester#4001", name = "4001"),
+            User(pk = "tester#4002", name = "4002"),
+        )
+        repository.transactionSaveItems(samples)
+
+        val after = repository.transactionGetItems(samples)
+        assertThat(after).hasSize(samples.size)
+
+        repository.transactionDeleteItems(samples)
+
+        val deletedItems = repository.transactionGetItems(samples)
+        assertThat(deletedItems).hasSize(samples.size)
+
+        deletedItems.forEach {
+            assertThat(it).isNull()
+        }
+    }
+
+    @Test
+    fun batchByKeysTest() {
         val samples = listOf(
             User(pk = "tester#3001", name = "3001"),
             User(pk = "tester#3002", name = "3002"),
@@ -113,6 +165,23 @@ class UserRepositoryTest {
         assertThat(after).hasSize(samples.size)
 
         repository.batchDeleteByKeys(samples.map { it.key() })
+
+        val deletedItems = repository.batchGetItems(samples.map { it.key() })
+        assertThat(deletedItems).isEmpty()
+    }
+
+    @Test
+    fun batchByItemsTest() {
+        val samples = listOf(
+            User(pk = "tester#5001", name = "5001"),
+            User(pk = "tester#5002", name = "5002"),
+        )
+        repository.batchSaveItems(samples)
+
+        val after = repository.batchGetItems(samples.map { it.key() })
+        assertThat(after).hasSize(samples.size)
+
+        repository.batchDelete(samples)
 
         val deletedItems = repository.batchGetItems(samples.map { it.key() })
         assertThat(deletedItems).isEmpty()

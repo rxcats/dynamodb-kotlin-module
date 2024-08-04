@@ -1,6 +1,7 @@
 package io.github.rxcats.aws.dynamodb
 
 import io.github.rxcats.aws.dynamodb.converter.CompressionAttributeConverter
+import io.github.rxcats.aws.dynamodb.extensions.DynamoDbKtConvertedBy
 import io.github.rxcats.aws.dynamodb.extensions.DynamoDbKtTableName
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.stereotype.Repository
 import software.amazon.awssdk.enhanced.dynamodb.Key
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbConvertedBy
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbIgnore
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey
 import kotlin.test.Test
@@ -19,7 +19,7 @@ data class CompressionData(
     @get:DynamoDbPartitionKey
     val pk: String,
 
-    @get:DynamoDbConvertedBy(CompressionAttributeConverter::class)
+    @DynamoDbKtConvertedBy(CompressionAttributeConverter::class)
     val data: ByteArray,
 ) {
     @get:DynamoDbIgnore
@@ -66,9 +66,7 @@ class CompressionAttributeConverterTest {
         }
     }
 
-    @Test
-    fun basicTest() {
-        val sampleData = """
+    val sampleData = """
             {
                 "widget": {
                     "debug": "on",
@@ -99,17 +97,19 @@ class CompressionAttributeConverterTest {
             }
         """.trimIndent()
 
-        val dataBytes = sampleData.toByteArray()
-
+    @Test
+    fun basicTest() {
+        val sampleDataBytes = sampleData.toByteArray()
         val data = CompressionData(
             pk = "compression#1001",
-            data = dataBytes,
+            data = sampleDataBytes,
         )
 
         repository.save(data)
 
         val after = repository.getItem(data.key())
         assertThat(after).isNotNull()
+        assertThat(after?.data).isEqualTo(sampleDataBytes)
         assertThat(after?.dataAsString).isEqualTo(sampleData)
     }
 

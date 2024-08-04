@@ -1,8 +1,10 @@
+[![codecov](https://codecov.io/gh/rxcats/dynamodb-kotlin-module/branch/main/graph/badge.svg)](https://codecov.io/gh/rxcats/dynamodb-kotlin-module)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Maven Central Version](https://img.shields.io/maven-central/v/io.github.rxcats/dynamodb-kotlin-module)](https://central.sonatype.com/artifact/io.github.rxcats/dynamodb-kotlin-module)
 
-# AWS SDK for Java 2.x DynamoDbEnhancedClient Kotlin Module
+# Java 2.x DynamoDbEnhancedClient Kotlin Module
 
-Kotlin module for 2.x DynamoDbEnhancedClient AWS SDK.
+Kotlin module for java 2.x DynamoDbEnhancedClient AWS SDK.
 
 Adapting an idiomatic kotlin data model for use with the v2 dynamodb mapper is a pain, and full of compromises.
 data classes emulate a bean, which nullifies much of the advantages of data classes.
@@ -15,6 +17,16 @@ This module provides a new `TableSchema` implementation that adds support for ko
 Java 17 and 21
 
 ## Quickstart with Spring Boot
+
+Add dependencies
+
+```
+dependencies {
+    implementation("io.github.rxcats:dynamodb-kotlin-module:0.0.2")
+}
+```
+
+Work with Spring Boot
 
 ```kotlin
 
